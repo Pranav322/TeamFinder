@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-
+import { UserProvider } from '@auth0/nextjs-auth0/client';
+import NavBar from "./components/NavBar";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
@@ -16,7 +17,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <UserProvider>
+        
+       {/* <NavBar /> */}
+
+
       <body className={inter.className}>{children}</body>
+      </UserProvider>
     </html>
   );
 }
