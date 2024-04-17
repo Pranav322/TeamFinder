@@ -1,14 +1,14 @@
 // pages/projects.js
 import { prisma } from '@/lib/prisma';
 import React from 'react';
-import NavBar from '../components/NavBar';
+
 
 export default async function Projects() {
   const projects = await prisma.project.findMany();
 
   return (
     <>
-      <NavBar />
+     
       <div className="flex flex-wrap justify-center">
         {projects.map((project) => (
           <div key={project.id} className="m-4">
