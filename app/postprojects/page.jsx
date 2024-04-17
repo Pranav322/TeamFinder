@@ -1,7 +1,7 @@
 'use client'
 import { useState } from 'react';
 import { useUser } from '@auth0/nextjs-auth0/client';
-import NavBar from '../components/NavBar';
+
 import { useRouter } from 'next/navigation'
 export default function ProjectForm() {
   const router = useRouter()
@@ -45,7 +45,6 @@ export default function ProjectForm() {
 
   return (
     <>
-    <NavBar />
    
     <div className="flex justify-center items-center h-screen bg-gray-100">
       <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">

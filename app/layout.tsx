@@ -19,10 +19,12 @@ export default function RootLayout({
     <html lang="en">
       <UserProvider>
         
-       {/* <NavBar /> */}
+      
 
 
-      <body className={inter.className}>{children}</body>
+      <body className={inter.className}>
+        <NavBar />
+        {children}</body>
       </UserProvider>
     </html>
   );

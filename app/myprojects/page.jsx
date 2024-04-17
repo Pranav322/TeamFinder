@@ -1,7 +1,7 @@
 'use client'
 import { useEffect, useState } from 'react';
 import { useUser } from '@auth0/nextjs-auth0/client';
-import NavBar from '../components/NavBar';
+
 
 function MyProjects() {
   const { user } = useUser();
@@ -43,7 +43,7 @@ function MyProjects() {
 
   return (
     <>
-    <NavBar />
+   
     
     <div className="container mx-auto p-4">
       <h1 className="text-3xl font-bold mb-4">My Projects</h1>
