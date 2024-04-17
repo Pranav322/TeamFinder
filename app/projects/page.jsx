@@ -12,7 +12,7 @@ export default async function Projects() {
       <div className="flex flex-wrap justify-center">
         {projects.map((project) => (
           <div key={project.id} className="m-4">
-            <div className="relative flex flex-col text-gray-700 bg- shadow-md bg-clip-border rounded-xl w-96">
+            <div className="relative flex flex-col text-gray-700 bg- shadow-md bg-clip-border rounded-xl w-96 ">
               <div className="p-6">
                 <h5 className="block mb-2 font-sans text-xl antialiased font-semibold leading-snug tracking-normal text-blue-gray-900">
                   {project.title}
