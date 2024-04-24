@@ -21,6 +21,6 @@
       "@/*": ["./*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "app/api/createproject/route.js", "app/api/myprojects/route.js", "app/myprojects/page.jsx", "app/postprojects/page.jsx", "app/projects/page.jsx", "app/layout.tsx"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "app/api/createproject/route.js", "app/api/myprojects/route.js", "app/myprojects/page.jsx", "app/postprojects/page.jsx", "app/projects/page.jsx", "app/layout.tsx", "app/api/request/route.js"],
   "exclude": ["node_modules"]
 }
