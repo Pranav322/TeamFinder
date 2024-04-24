@@ -4,6 +4,7 @@ import { useUser } from '@auth0/nextjs-auth0/client';
 
 import { useRouter } from 'next/navigation'
 export default function ProjectForm() {
+  console.log('ProjectForm rendered');
   const router = useRouter()
   const { user } = useUser();
   const [title, setTitle] = useState('');

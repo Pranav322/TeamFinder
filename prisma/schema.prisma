@@ -9,16 +9,35 @@ generator client {
 }
 
 datasource db {
-  provider  = "postgresql"
-  url  	    = env("DATABASE_URL")
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 
   // directUrl = env("DATABASE_URL_UNPOOLED")
 }
 
 model Project {
-  id        Int      @id @default(autoincrement())
-  title     String
-  description String
-  techStack String[]
-  userEmail String
+  id           Int            @id @default(autoincrement())
+  title        String
+  description  String
+  techStack    String[]
+  userEmail    String
+  joinRequests JoinRequest[]
+  Notification Notification[]
+}
+
+model JoinRequest {
+  id             Int     @id @default(autoincrement())
+  projectId      Int
+  requesterEmail String
+  status         String // Pending, Accepted, Rejected
+  project        Project @relation(fields: [projectId], references: [id])
+}
+
+model Notification {
+  id Int @id @default(autoincrement())
+
+  userEmail         String
+  projectowneremail String
+  projectId         Int
+  project           Project @relation(fields: [projectId], references: [id])
 }

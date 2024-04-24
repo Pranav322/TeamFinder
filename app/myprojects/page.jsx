@@ -4,6 +4,7 @@ import { useUser } from '@auth0/nextjs-auth0/client';
 
 
 function MyProjects() {
+  
   const { user } = useUser();
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -11,6 +12,7 @@ function MyProjects() {
   useEffect(() => {
     const fetchProjects = async () => {
       if (user?.email) {
+        
         try {
           const response = await fetch('/api/myprojects', {
             method: 'POST',
