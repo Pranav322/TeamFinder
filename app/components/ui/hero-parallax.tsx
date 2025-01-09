@@ -17,6 +17,8 @@ export const HeroParallax = ({
     title: string;
     link: string;
     thumbnail: string;
+    description: string;
+    skillsNeeded: string[];
   }[];
 }) => {
   const firstRow = products.slice(0, 5);
@@ -57,7 +59,7 @@ export const HeroParallax = ({
   return (
     <div
       ref={ref}
-      className="h-[300vh] py-40 overflow-hidden  antialiased relative flex flex-col self-auto [perspective:1000px] [transform-style:preserve-3d]"
+      className="h-[300vh] py-40 overflow-hidden antialiased relative flex flex-col self-auto [perspective:1000px] [transform-style:preserve-3d]"
     >
       <Header />
       <motion.div
@@ -78,7 +80,7 @@ export const HeroParallax = ({
             />
           ))}
         </motion.div>
-        <motion.div className="flex flex-row  mb-20 space-x-20 ">
+        <motion.div className="flex flex-row mb-20 space-x-20">
           {secondRow.map((product) => (
             <ProductCard
               product={product}
@@ -103,15 +105,28 @@ export const HeroParallax = ({
 
 export const Header = () => {
   return (
-    <div className="max-w-7xl relative mx-auto py-20 md:py-40 px-4 w-full  left-0 top-0">
+    <div className="max-w-7xl relative mx-auto py-20 md:py-40 px-4 w-full left-0 top-0">
       <h1 className="text-2xl md:text-7xl font-bold dark:text-white">
-        Your Ultimate <br /> collaboration platform
+        Build Something <br /> Amazing Together
       </h1>
       <p className="max-w-2xl text-base md:text-xl mt-8 dark:text-neutral-200">
-        We help you find the perfect partner for perfect you and your project.
-        we also help you find the perfect project for you to work <br/>
-        Collaborate like never before 
+        Connect with passionate developers, designers, and creators. Find the perfect team 
+        for your next big idea or join exciting projects that match your skills.
       </p>
+      <div className="mt-8">
+        <Link
+          href="/post-project"
+          className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors mr-4"
+        >
+          Post a Project
+        </Link>
+        <Link
+          href="/explore"
+          className="px-6 py-3 border border-gray-300 rounded-lg hover:border-gray-400 transition-colors dark:border-gray-600 dark:hover:border-gray-500"
+        >
+          Explore Projects
+        </Link>
+      </div>
     </div>
   );
 };
@@ -124,6 +139,8 @@ export const ProductCard = ({
     title: string;
     link: string;
     thumbnail: string;
+    description: string;
+    skillsNeeded: string[];
   };
   translate: MotionValue<number>;
 }) => {
@@ -140,20 +157,31 @@ export const ProductCard = ({
     >
       <Link
         href={product.link}
-        className="block group-hover/product:shadow-2xl "
+        className="block group-hover/product:shadow-2xl"
       >
         <Image
           src={product.thumbnail}
           height="600"
           width="600"
-          className="object-cover object-left-top absolute h-full w-full inset-0"
+          className="object-cover object-left-top absolute h-full w-full inset-0 rounded-xl"
           alt={product.title}
         />
+        <div className="absolute inset-0 h-full w-full opacity-0 group-hover/product:opacity-90 bg-black pointer-events-none rounded-xl transition-opacity" />
+        <div className="absolute bottom-4 left-4 right-4 opacity-0 group-hover/product:opacity-100 transition-opacity">
+          <h2 className="text-xl font-semibold text-white mb-2">{product.title}</h2>
+          <p className="text-sm text-gray-200 mb-2">{product.description}</p>
+          <div className="flex flex-wrap gap-2">
+            {product.skillsNeeded.map((skill) => (
+              <span
+                key={skill}
+                className="text-xs px-2 py-1 bg-blue-500 text-white rounded-full"
+              >
+                {skill}
+              </span>
+            ))}
+          </div>
+        </div>
       </Link>
-      <div className="absolute inset-0 h-full w-full opacity-0 group-hover/product:opacity-80 bg-black pointer-events-none"></div>
-      <h2 className="absolute bottom-4 left-4 opacity-0 group-hover/product:opacity-100 text-white">
-        {product.title}
-      </h2>
     </motion.div>
   );
 };

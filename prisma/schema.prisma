@@ -1,9 +1,4 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
+// prisma/schema.prisma
 generator client {
   provider = "prisma-client-js"
 }
@@ -11,33 +6,23 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
-
-  // directUrl = env("DATABASE_URL_UNPOOLED")
-}
-
-model Project {
-  id           Int            @id @default(autoincrement())
-  title        String
-  description  String
-  techStack    String[]
-  userEmail    String
-  joinRequests JoinRequest[]
-  Notification Notification[]
-}
-
-model JoinRequest {
-  id             Int     @id @default(autoincrement())
-  projectId      Int
-  requesterEmail String
-  status         String // Pending, Accepted, Rejected
-  project        Project @relation(fields: [projectId], references: [id])
 }
 
 model Notification {
-  id Int @id @default(autoincrement())
-
+  id                String   @id @default(cuid())
   userEmail         String
   projectowneremail String
-  projectId         Int
-  project           Project @relation(fields: [projectId], references: [id])
+  projectId         String
+  status           String   @default("pending")
+  createdAt        DateTime @default(now())
+  project          Project  @relation(fields: [projectId], references: [id])
+}
+
+model Project {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  techStack   String[]
+  userEmail   String
+  notifications Notification[]
 }
