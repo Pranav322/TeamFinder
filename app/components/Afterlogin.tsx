@@ -3,11 +3,19 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { HeroParallax } from "./ui/hero-parallax";
 
+// Define the type for the product objects
+interface Product {
+  title: string;
+  description: string;
+  skillsNeeded: string[];
+  link: string;
+  thumbnail: string; // Update the type if Unsplash might return `undefined`
+}
+
 export function HeroParallaxDemo() {
-  const [products, setProducts] = useState([]);
+  const [products, setProducts] = useState<Product[]>([]); // Specify the Product[] type here
 
   useEffect(() => {
-    // Function to fetch images dynamically from Unsplash API
     const fetchImages = async () => {
       const projectTitles = [
         "AI Chat Application",
@@ -28,24 +36,20 @@ export function HeroParallaxDemo() {
       ];
 
       try {
-        // Fetching images from Unsplash for each project title
         const images = await Promise.all(
           projectTitles.map(async (title) => {
-            const res = await axios.get(
-              `https://api.unsplash.com/search/photos`,
-              {
-                params: {
-                  query: title.split(" ").join("+"), // Use project title for the search query
-                  page: 1,
-                  per_page: 1, // Fetch one image per project
-                },
-                headers: {
-                  Authorization: `Client-ID ${process.env.NEXT_PUBLIC_UNSPLASH_ACCESS_KEY}`,
-                },
-              }
-            );
+            const res = await axios.get(`https://api.unsplash.com/search/photos`, {
+              params: {
+                query: title.split(" ").join("+"),
+                page: 1,
+                per_page: 1,
+              },
+              headers: {
+                Authorization: `Client-ID ${process.env.NEXT_PUBLIC_UNSPLASH_ACCESS_KEY}`,
+              },
+            });
 
-            return res.data.results[0]?.urls?.small || ''; // Return image URL if available
+            return res.data.results[0]?.urls?.small || ""; // Default to an empty string if no image
           })
         );
 
