@@ -1,10 +1,12 @@
 'use client'
 import { useEffect, useState } from 'react'
-import { useUser } from '@auth0/nextjs-auth0/client'
+
+import { useAuth } from '@/contexts/AuthContext';
 import { Loader2 } from 'lucide-react'
 
 export default function PostedProjects() {
-  const { user } = useUser()
+  // const { user } = useUser()
+  const { user } = useAuth();
   const [projects, setProjects] = useState([])
   const [loading, setLoading] = useState(true)
 
