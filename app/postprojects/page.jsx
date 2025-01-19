@@ -1,12 +1,14 @@
 'use client'
 import { useState } from 'react'
-import { useUser } from '@auth0/nextjs-auth0/client'
+
+import { useAuth } from '@/contexts/AuthContext'
 import { useRouter } from 'next/navigation'
 import { Loader2 } from 'lucide-react'
 
 export default function ProjectForm() {
   const router = useRouter()
-  const { user } = useUser()
+
+  const { user } = useAuth();
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [techStack, setTechStack] = useState('')
