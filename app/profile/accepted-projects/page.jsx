@@ -1,10 +1,14 @@
 // app/profile/accepted-projects/page.jsx
+// This page is for the user to see the projects they have been accepted to
 'use client'
+
 import { useEffect, useState } from 'react';
-import { useUser } from '@auth0/nextjs-auth0/client';
+
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function AcceptedProjects() {
-  const { user } = useUser();
+
+  const { user } = useAuth();
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
 
