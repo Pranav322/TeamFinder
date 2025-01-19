@@ -9,12 +9,12 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@auth0/nextjs-auth0": "^3.5.0",
+  
     "@emotion/react": "^11.11.4",
     "@emotion/styled": "^11.11.5",
     "@mui/icons-material": "^5.15.15",
     "@mui/material": "^5.15.15",
-    "@next/swc-win32-x64-msvc": "^15.1.5",
+    
     "@prisma/client": "^5.12.1",
     "axios": "^1.7.9",
     "clsx": "^2.1.0",
