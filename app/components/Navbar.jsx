@@ -15,8 +15,10 @@ export default function NavBar() {
 
   useEffect(() => {
     const fetchNotifications = async () => {
+      if (!user?.email) return
+      
       try {
-        const response = await fetch('/api/notifications');
+        const response = await fetch(`/api/notifications?userEmail=${encodeURIComponent(user.email)}`);
         const data = await response.json();
         setNotifications(data);
       } catch (error) {
@@ -68,14 +70,14 @@ export default function NavBar() {
           <div className="flex items-center space-x-6">
             {user ? (
               <>
-                <div className="relative group">
+                <Link href="/notifications" className="relative group">
                   <NotificationsIcon className="text-gray-300 hover:text-white cursor-pointer transition-colors duration-300 transform hover:scale-110" />
                   {notifications.length > 0 && (
                     <span className="absolute -top-2 -right-2 bg-gradient-to-r from-red-500 to-pink-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center shadow-lg transform transition-transform group-hover:scale-110">
                       {notifications.length}
                     </span>
                   )}
-                </div>
+                </Link>
                 <div className="relative">
                   <AccountCircleIcon 
                     className="text-gray-300 hover:text-white cursor-pointer transition-all duration-300 transform hover:scale-110" 
@@ -85,8 +87,15 @@ export default function NavBar() {
                     <div className="absolute right-0 mt-3 w-56 rounded-xl shadow-lg bg-white/95 backdrop-blur-sm ring-1 ring-black/5 transform transition-all duration-300 z-50">
                       <div className="py-2" role="menu" aria-orientation="vertical">
                         <Link 
-                          href="/profile/posted-projects" 
+                          href="/owner-dashboard" 
                           className="block px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 hover:text-blue-600 transition-colors duration-200 first:rounded-t-xl"
+                          onClick={() => setShowDropdown(false)}
+                        >
+                          Owner Dashboard
+                        </Link>
+                        <Link 
+                          href="/profile/posted-projects" 
+                          className="block px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 hover:text-blue-600 transition-colors duration-200"
                           onClick={() => setShowDropdown(false)}
                         >
                           My Projects
