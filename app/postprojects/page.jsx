@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
 import { useRouter } from 'next/navigation'
 import { Loader2 } from 'lucide-react'
+import { uploadImageToCloudinary } from '@/lib/cloudinary'
 
 export default function ProjectForm() {
   const router = useRouter()
@@ -12,6 +13,7 @@ export default function ProjectForm() {
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [techStack, setTechStack] = useState('')
+  const [image, setImage] = useState(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const userEmail = user?.email || ''
 
@@ -19,14 +21,22 @@ export default function ProjectForm() {
     e.preventDefault()
     setIsSubmitting(true)
 
-    const projectData = {
-      title,
-      description,
-      techStack: techStack.split(',').map((tech) => tech.trim()),
-      userEmail,
-    }
-
     try {
+      let imageUrl = null
+      
+      // Upload image to Cloudinary if provided
+      if (image) {
+        imageUrl = await uploadImageToCloudinary(image)
+      }
+
+      const projectData = {
+        title,
+        description,
+        techStack: techStack.split(',').map((tech) => tech.trim()),
+        userEmail,
+        imageUrl,
+      }
+
       const response = await fetch('/api/createproject', {
         method: 'POST',
         headers: {
@@ -102,6 +112,20 @@ export default function ProjectForm() {
                 required
               />
               <p className="mt-1 text-sm text-gray-400">Separate technologies with commas</p>
+            </div>
+
+            <div>
+              <label htmlFor="image" className="block text-sm font-medium text-gray-300 mb-1">
+                Project Image (Optional)
+              </label>
+              <input
+                id="image"
+                type="file"
+                accept="image/*"
+                onChange={(e) => setImage(e.target.files[0])}
+                className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+              />
+              <p className="mt-1 text-sm text-gray-400">Upload an image to represent your project</p>
             </div>
 
             <button

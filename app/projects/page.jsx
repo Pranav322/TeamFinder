@@ -1,15 +1,21 @@
 'use client'
 import { useState, useEffect } from 'react'
-import { Loader2 } from 'lucide-react'
+import { Loader2, CheckCircle, XCircle, Clock, MessageCircle } from 'lucide-react'
+import Image from 'next/image'
+import { useAuth } from '@/contexts/AuthContext'
+import { useRouter } from 'next/navigation'
 
 export default function Projects() {
   const [projects, setProjects] = useState([])
   const [loading, setLoading] = useState(true)
+  const { user } = useAuth()
+  const router = useRouter()
 
   useEffect(() => {
     const fetchProjects = async () => {
       try {
-        const response = await fetch('/api/projects')
+        const url = user?.email ? `/api/projects?userEmail=${encodeURIComponent(user.email)}` : '/api/projects'
+        const response = await fetch(url)
         const data = await response.json()
         setProjects(data)
       } catch (error) {
@@ -20,26 +26,90 @@ export default function Projects() {
     }
 
     fetchProjects()
-  }, [])
+  }, [user])
 
   const handleRequest = async (projectId, projectOwnerEmail) => {
-    const userEmail = 'pranav88095@gmail.com'
+    if (!user?.email) return
+    
     try {
       const response = await fetch('/api/request', {
         method: 'POST',
-        body: JSON.stringify({ projectId, userEmail, projectOwnerEmail }),
+        body: JSON.stringify({ projectId, userEmail: user.email, projectOwnerEmail }),
         headers: {
           'Content-Type': 'application/json',
         },
       })
 
       if (response.ok) {
+        // Update the project's request status locally
+        setProjects(prevProjects => 
+          prevProjects.map(project => 
+            project.id === projectId 
+              ? { ...project, requestStatus: 'pending' }
+              : project
+          )
+        )
         console.log('Request sent successfully')
       } else {
-        console.error('Failed to send request')
+        const errorData = await response.json()
+        console.error('Failed to send request:', errorData.error)
       }
     } catch (error) {
       console.error('Error sending request:', error)
+    }
+  }
+
+  const getButtonContent = (project) => {
+    if (!project.requestStatus) {
+      return (
+        <>
+          Request to Join
+          <span className="group-hover:translate-x-0.5 transition-transform">→</span>
+        </>
+      )
+    }
+    
+    switch (project.requestStatus) {
+      case 'pending':
+        return (
+          <>
+            <Clock className="w-4 h-4" />
+            Request Pending
+          </>
+        )
+      case 'approved':
+        return (
+          <>
+            <MessageCircle className="w-4 h-4" />
+            Chat
+          </>
+        )
+      case 'rejected':
+        return (
+          <>
+            <XCircle className="w-4 h-4" />
+            Request Rejected
+          </>
+        )
+      default:
+        return 'Request to Join'
+    }
+  }
+
+  const getButtonStyles = (project) => {
+    if (!project.requestStatus) {
+      return "w-full inline-flex justify-center items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm gap-2"
+    }
+    
+    switch (project.requestStatus) {
+      case 'pending':
+        return "w-full inline-flex justify-center items-center px-4 py-2 bg-yellow-600 text-white rounded-lg cursor-not-allowed font-medium text-sm gap-2"
+      case 'approved':
+        return "w-full inline-flex justify-center items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium text-sm gap-2"
+      case 'rejected':
+        return "w-full inline-flex justify-center items-center px-4 py-2 bg-red-600 text-white rounded-lg cursor-not-allowed font-medium text-sm gap-2"
+      default:
+        return "w-full inline-flex justify-center items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm gap-2"
     }
   }
 
@@ -72,6 +142,16 @@ export default function Projects() {
                   className="group bg-gray-800 rounded-xl border border-gray-700 hover:border-gray-600 p-6 transition-all duration-200"
                 >
                   <div className="flex flex-col h-full">
+                    {project.imageUrl && (
+                      <div className="mb-4 relative h-48 w-full rounded-lg overflow-hidden">
+                        <Image
+                          src={project.imageUrl}
+                          alt={project.title}
+                          fill
+                          className="object-cover group-hover:scale-105 transition-transform duration-200"
+                        />
+                      </div>
+                    )}
                     <div className="mb-4">
                       <h2 className="text-xl font-semibold text-white group-hover:text-blue-400 transition-colors">
                         {project.title}
@@ -93,11 +173,17 @@ export default function Projects() {
 
                       <div className="mt-4 pt-4 border-t border-gray-700">
                         <button
-                          onClick={() => handleRequest(project.id, project.userEmail)}
-                          className="w-full inline-flex justify-center items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm gap-2"
+                          onClick={() => {
+                            if (!project.requestStatus) {
+                              handleRequest(project.id, project.userEmail)
+                            } else if (project.requestStatus === 'approved') {
+                              router.push(`/chat/${project.id}`)
+                            }
+                          }}
+                          disabled={project.requestStatus === 'pending' || project.requestStatus === 'rejected'}
+                          className={getButtonStyles(project)}
                         >
-                          Request to Join
-                          <span className="group-hover:translate-x-0.5 transition-transform">→</span>
+                          {getButtonContent(project)}
                         </button>
                       </div>
                     </div>

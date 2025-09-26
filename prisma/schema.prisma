@@ -24,5 +24,16 @@ model Project {
   description String
   techStack   String[]
   userEmail   String
+  imageUrl    String?
   notifications Notification[]
+  chats       Chat[]
+}
+
+model Chat {
+  id        String   @id @default(cuid())
+  projectId String
+  userEmail String
+  message   String
+  createdAt DateTime @default(now())
+  project   Project  @relation(fields: [projectId], references: [id])
 }
