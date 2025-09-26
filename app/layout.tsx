@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from '@/contexts/AuthContext';
 import NavBar from "./components/Navbar";
+import FloatingChat from "./components/FloatingChat";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
@@ -21,6 +22,7 @@ export default function RootLayout({
         <body className={inter.className}>
           <NavBar />
           {children}
+          <FloatingChat />
         </body>
       </AuthProvider>
     </html>
