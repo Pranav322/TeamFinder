@@ -4,14 +4,25 @@ import { NextResponse } from 'next/server';
 
 export async function GET(req: Request) {
   try {
-    // Get notifications from the last 7 days
-    const sevenDaysAgo = new Date();
-    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+    const { searchParams } = new URL(req.url);
+    const userEmail = searchParams.get('userEmail');
+    
+    if (!userEmail) {
+      return NextResponse.json({ error: 'User email is required' }, { status: 400 });
+    }
 
+    // Get notifications for projects owned by the user
     const notifications = await prisma.notification.findMany({
       where: {
-        createdAt: {
-          gte: sevenDaysAgo
+        projectowneremail: userEmail,
+        status: 'pending'
+      },
+      include: {
+        project: {
+          select: {
+            title: true,
+            description: true
+          }
         }
       },
       orderBy: {
