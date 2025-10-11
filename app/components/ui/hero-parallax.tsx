@@ -115,13 +115,13 @@ export const Header = () => {
       </p>
       <div className="mt-8">
         <Link
-          href="/post-project"
+          href="/postprojects"
           className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors mr-4"
         >
           Post a Project
         </Link>
         <Link
-          href="/explore"
+          href="/projects"
           className="px-6 py-3 border border-gray-300 rounded-lg hover:border-gray-400 transition-colors dark:border-gray-600 dark:hover:border-gray-500"
         >
           Explore Projects
