@@ -10,64 +10,121 @@ export async function GET(req) {
   }
 
   try {
-    // Get all notifications for projects owned by the user
-    const notifications = await prisma.notification.findMany({
-      where: {
-        projectowneremail: userEmail
-      },
-      include: {
-        project: {
-          select: {
-            id: true,
-            title: true,
-            description: true,
-            imageUrl: true,
-            techStack: true
+    // Optimized stats and data fetching using parallel queries and database-level aggregation
+    const [statsData, pendingRequests, rejectedRequests, projectsData] = await Promise.all([
+      // 1. Get counts for each status using groupBy
+      prisma.notification.groupBy({
+        by: ['status'],
+        where: {
+          projectowneremail: userEmail
+        },
+        _count: {
+          _all: true
+        }
+      }),
+      // 2. Fetch only pending notifications with project info
+      prisma.notification.findMany({
+        where: {
+          projectowneremail: userEmail,
+          status: 'pending'
+        },
+        include: {
+          project: {
+            select: {
+              id: true,
+              title: true,
+              description: true,
+              imageUrl: true,
+              techStack: true
+            }
+          }
+        },
+        orderBy: {
+          createdAt: 'desc'
+        }
+      }),
+      // 3. Fetch only rejected notifications with project info
+      prisma.notification.findMany({
+        where: {
+          projectowneremail: userEmail,
+          status: 'rejected'
+        },
+        include: {
+          project: {
+            select: {
+              id: true,
+              title: true,
+              description: true,
+              imageUrl: true,
+              techStack: true
+            }
+          }
+        },
+        orderBy: {
+          createdAt: 'desc'
+        }
+      }),
+      // 4. Fetch unique projects with approved notifications and their team members
+      prisma.project.findMany({
+        where: {
+          userEmail: userEmail,
+          notifications: {
+            some: {
+              status: 'approved'
+            }
+          }
+        },
+        select: {
+          id: true,
+          title: true,
+          description: true,
+          imageUrl: true,
+          techStack: true,
+          notifications: {
+            where: {
+              status: 'approved'
+            },
+            select: {
+              userEmail: true,
+              createdAt: true
+            },
+            orderBy: {
+              createdAt: 'desc'
+            }
           }
         }
-      },
-      orderBy: {
-        createdAt: 'desc'
-      }
-    });
+      })
+    ]);
 
-    // Separate by status
-    const pending = notifications.filter(n => n.status === 'pending');
-    const approved = notifications.filter(n => n.status === 'approved');
-    const rejected = notifications.filter(n => n.status === 'rejected');
-
-    // Get unique approved projects with their team members (excluding project owner)
-    const approvedProjects = approved.reduce((acc, notification) => {
-      const projectId = notification.projectId;
-      if (!acc[projectId]) {
-        acc[projectId] = {
-          ...notification.project,
-          teamMembers: []
-        };
-      }
-      // Only add team members who are not the project owner
-      if (notification.userEmail !== userEmail) {
-        acc[projectId].teamMembers.push({
-          userEmail: notification.userEmail,
-          joinedAt: notification.createdAt
-        });
-      }
-      return acc;
-    }, {});
-
+    // Calculate stats from grouped data
     const stats = {
-      totalRequests: notifications.length,
-      pending: pending.length,
-      approved: approved.length,
-      rejected: rejected.length,
-      activeProjects: Object.keys(approvedProjects).length
+      totalRequests: statsData.reduce((acc, curr) => acc + curr._count._all, 0),
+      pending: statsData.find(s => s.status === 'pending')?._count._all || 0,
+      approved: statsData.find(s => s.status === 'approved')?._count._all || 0,
+      rejected: statsData.find(s => s.status === 'rejected')?._count._all || 0,
+      activeProjects: projectsData.length
     };
+
+    // Format approved projects and their team members
+    const approvedProjects = projectsData.map(project => ({
+      id: project.id,
+      title: project.title,
+      description: project.description,
+      imageUrl: project.imageUrl,
+      techStack: project.techStack,
+      teamMembers: project.notifications
+        .filter(n => n.userEmail !== userEmail)
+        .map(n => ({
+          userEmail: n.userEmail,
+          joinedAt: n.createdAt
+        }))
+    }));
 
     return NextResponse.json({
       stats,
-      pendingRequests: pending,
-      approvedProjects: Object.values(approvedProjects),
-      rejectedRequests: rejected
+      pendingRequests,
+      approvedProjects,
+      rejectedRequests
     });
 
   } catch (error) {
@@ -75,4 +132,3 @@ export async function GET(req) {
     return NextResponse.json({ error: 'Failed to fetch stats' }, { status: 500 });
   }
 }
-
