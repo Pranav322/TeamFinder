@@ -15,8 +15,6 @@ export default function AcceptedProjects() {
   useEffect(() => {
     const fetchAcceptedProjects = async () => {
       if (user?.email) {
-        console.log('Current user email:', user.email);
-        
         try {
           const response = await fetch('/api/accepted-projects', {
             method: 'POST',
@@ -25,9 +23,8 @@ export default function AcceptedProjects() {
             },
             body: JSON.stringify({ email: user.email }),
           });
-  
+
           const data = await response.json();
-          console.log('Accepted projects response:', data); // Add this log
           setProjects(data.data || []);
         } catch (error) {
           console.error('Error fetching accepted projects:', error);
@@ -36,7 +33,7 @@ export default function AcceptedProjects() {
         }
       }
     };
-  
+
     fetchAcceptedProjects();
   }, [user]);
 
@@ -55,7 +52,7 @@ export default function AcceptedProjects() {
               <p className="text-gray-600 mb-4">{project.description}</p>
               <div className="flex flex-wrap gap-2">
                 {project.techStack.map((tech, index) => (
-                  <span 
+                  <span
                     key={index}
                     className="bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full"
                   >
